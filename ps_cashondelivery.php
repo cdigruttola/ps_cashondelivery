@@ -77,13 +77,6 @@ class Ps_Cashondelivery extends PaymentModule
             return [];
         }
 
-        /** @var Cart $cart */
-        $cart = $params['cart'];
-
-        if ($cart->isVirtualCart()) {
-            return [];
-        }
-
         $cashOnDeliveryOption = new PaymentOption();
         $cashOnDeliveryOption->setModuleName($this->name);
         $cashOnDeliveryOption->setCallToActionText($this->trans('Pay by Cash on Delivery', [], 'Modules.Cashondelivery.Shop'));

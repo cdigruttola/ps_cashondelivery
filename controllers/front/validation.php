@@ -102,8 +102,7 @@ class Ps_CashondeliveryValidationModuleFrontController extends ModuleFrontContro
         return true === Validate::isLoadedObject($this->context->cart)
             && true === Validate::isUnsignedInt($this->context->cart->id_customer)
             && true === Validate::isUnsignedInt($this->context->cart->id_address_delivery)
-            && true === Validate::isUnsignedInt($this->context->cart->id_address_invoice)
-            && false === $this->context->cart->isVirtualCart();
+            && true === Validate::isUnsignedInt($this->context->cart->id_address_invoice);
     }
 
     /**
