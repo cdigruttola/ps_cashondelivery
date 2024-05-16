@@ -26,7 +26,7 @@ jobs:
           - '1.7.7.8' 
           - '1.7.8.11' 
           - '8.0.5' 
-          - '8.1.5'
+          - '8.1.6'
           - 'nightly'
     env:
       PS_VERSION: ${{ matrix.PS_VERSION }}
