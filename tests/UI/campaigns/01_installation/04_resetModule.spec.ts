@@ -1,26 +1,24 @@
 import {
-  // Import utils
-  testContext,
-  // Import BO pages
   boDashboardPage,
   boLoginPage,
   boModuleManagerPage,
   boModuleManagerUninstalledModulesPage,
-  // Import FO pages
-  foClassicCartPage,
-  foClassicHomePage,
-  foClassicLoginPage,
-  // Import data
   dataCustomers,
   dataModules,
+  foClassicCartPage,
   foClassicCheckoutPage,
+  foClassicHomePage,
+  foClassicLoginPage,
+  foClassicModalBlockCartPage,
+  foClassicModalQuickViewPage,
+  utilsTest,
 } from '@prestashop-core/ui-testing';
 
 import { test, expect, Page, BrowserContext } from '@playwright/test';
 import semver from 'semver';
 
 const baseContext: string = 'modules_ps_cashondelivery_installation_resetModule';
-const psVersion = testContext.getPSVersion();
+const psVersion = utilsTest.getPSVersion();
 
 test.describe('Cash on delivery (COD) module - Reset module', async () => {
   let browserContext: BrowserContext;
@@ -35,7 +33,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should login in BO', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'loginBO', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'loginBO', baseContext);
 
     await boLoginPage.goTo(page, global.BO.URL);
     await boLoginPage.successLogin(page, global.BO.EMAIL, global.BO.PASSWD);
@@ -46,7 +44,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
 
   if (semver.lt(psVersion, '8.0.0')) {
     test('should go to \'Modules > Module Manager\' page for installing module', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'goToModuleManagerPageToInstall', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToModuleManagerPageToInstall', baseContext);
   
       await boDashboardPage.goToSubMenu(
         page,
@@ -60,7 +58,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
     });
 
     test('should install module', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'searchModuleToInstall', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'searchModuleToInstall', baseContext);
   
       await boModuleManagerUninstalledModulesPage.goToTabUninstalledModules(page);
   
@@ -70,7 +68,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   }
 
   test('should go to \'Modules > Module Manager\' page', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'goToModuleManagerPage', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToModuleManagerPage', baseContext);
 
     await boDashboardPage.goToSubMenu(
       page,
@@ -84,14 +82,14 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test(`should search the module ${dataModules.psCashOnDelivery.name}`, async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'searchModule', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'searchModule', baseContext);
 
     const isModuleVisible = await boModuleManagerPage.searchModule(page, dataModules.psCashOnDelivery);
     expect(isModuleVisible).toEqual(true);
   });
 
   test('should display the reset modal and cancel it', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'resetModuleAndCancel', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'resetModuleAndCancel', baseContext);
 
     const textResult = await boModuleManagerPage.setActionInModule(page, dataModules.psCashOnDelivery, 'reset', true);
     expect(textResult).toEqual('');
@@ -104,14 +102,14 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should reset the module', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'resetModule', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'resetModule', baseContext);
 
     const successMessage = await boModuleManagerPage.setActionInModule(page, dataModules.psCashOnDelivery, 'reset');
     expect(successMessage).toEqual(boModuleManagerPage.resetModuleSuccessMessage(dataModules.psCashOnDelivery.tag));
   });
 
   test('should go to Front Office', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'goToFo', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToFo', baseContext);
 
     page = await boModuleManagerPage.viewMyShop(page);
     await foClassicHomePage.changeLanguage(page, 'en');
@@ -121,7 +119,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should go to login page', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'goToLoginPageFO', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToLoginPageFO', baseContext);
 
     await foClassicHomePage.goToLoginPage(page);
 
@@ -130,7 +128,7 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should sign in with default customer', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'sighInFO', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'sighInFO', baseContext);
 
     await foClassicLoginPage.customerLogin(page, dataCustomers.johnDoe);
 
@@ -139,20 +137,21 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should add the first product to the cart', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'addProductToCart', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'addProductToCart', baseContext);
 
     await foClassicLoginPage.goToHomePage(page);
 
     // Add first product to cart by quick view
-    await foClassicHomePage.addProductToCartByQuickView(page, 1);
-    await foClassicHomePage.proceedToCheckout(page);
+    await foClassicHomePage.quickViewProduct(page, 1);
+    await foClassicModalQuickViewPage.addToCartByQuickView(page);
+    await foClassicModalBlockCartPage.proceedToCheckout(page);
 
     const pageTitle = await foClassicCartPage.getPageTitle(page);
     expect(pageTitle).toEqual(foClassicCartPage.pageTitle);
   });
 
   test('should proceed to checkout and check Step Address', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'checkAddressStep', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkAddressStep', baseContext);
 
     await foClassicCartPage.clickOnProceedToCheckout(page);
 
@@ -167,21 +166,21 @@ test.describe('Cash on delivery (COD) module - Reset module', async () => {
   });
 
   test('should validate Step Address and go to Delivery Step', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'checkDeliveryStep', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkDeliveryStep', baseContext);
 
     const isStepAddressComplete = await foClassicCheckoutPage.goToDeliveryStep(page);
     expect(isStepAddressComplete).toEqual(true);
   });
 
   test('should go to payment step', async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'goToPaymentStep', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToPaymentStep', baseContext);
 
     const isStepDeliveryComplete = await foClassicCheckoutPage.goToPaymentStep(page);
     expect(isStepDeliveryComplete, 'Step Address is not complete').toEqual(true);
   });
 
   test(`should check the '${dataModules.psCashOnDelivery.name}' payment module`, async () => {
-    await testContext.addContextItem(test.info(), 'testIdentifier', 'checkPaymentModule', baseContext);
+    await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkPaymentModule', baseContext);
 
     // Payment step - Choose payment step
     const isVisible = await foClassicCheckoutPage.isPaymentMethodExist(page, dataModules.psCashOnDelivery.tag);
