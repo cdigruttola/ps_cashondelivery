@@ -1,20 +1,18 @@
 import {
-  // Import utils
-  testContext,
-  // Import BO pages
   boDashboardPage,
   boLoginPage,
   boOrdersPage,
-  // Import FO pages
+  dataCustomers,
+  dataOrderStatuses,
+  dataPaymentMethods,
   foClassicCartPage,
   foClassicCheckoutPage,
   foClassicCheckoutOrderConfirmationPage,
   foClassicHomePage,
   foClassicLoginPage,
-  // Import data
-  dataCustomers,
-  dataOrderStatuses,
-  dataPaymentMethods,
+  utilsTest,
+  foClassicModalBlockCartPage,
+  foClassicModalQuickViewPage,
 } from '@prestashop-core/ui-testing';
 
 import { test, expect, Page, BrowserContext } from '@playwright/test';
@@ -36,7 +34,7 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
 
   test.describe('FO - Order a product with Cash on delivery payment', async () => {
     test('should go to FO home page', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'goToFO', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToFO', baseContext);
 
       await foClassicHomePage.goToFo(page);
 
@@ -45,7 +43,7 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should go to login page', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'goToLoginPageFO', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToLoginPageFO', baseContext);
 
       await foClassicHomePage.goToLoginPage(page);
 
@@ -54,7 +52,7 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should sign in with default customer', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'sighInFO', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'sighInFO', baseContext);
 
       await foClassicLoginPage.customerLogin(page, dataCustomers.johnDoe);
 
@@ -63,20 +61,21 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should add the first product to the cart', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'addProductToCart', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'addProductToCart', baseContext);
 
       await foClassicLoginPage.goToHomePage(page);
 
       // Add first product to cart by quick view
-      await foClassicHomePage.addProductToCartByQuickView(page, 1);
-      await foClassicHomePage.proceedToCheckout(page);
+      await foClassicHomePage.quickViewProduct(page, 1);
+      await foClassicModalQuickViewPage.addToCartByQuickView(page);
+      await foClassicModalBlockCartPage.proceedToCheckout(page);
 
       const pageTitle = await foClassicCartPage.getPageTitle(page);
       expect(pageTitle).toEqual(foClassicCartPage.pageTitle);
     });
 
     test('should proceed to checkout and check Step Address', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'checkAddressStep', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkAddressStep', baseContext);
 
       await foClassicCartPage.clickOnProceedToCheckout(page);
 
@@ -91,21 +90,21 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should validate Step Address and go to Delivery Step', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'checkDeliveryStep', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkDeliveryStep', baseContext);
 
       const isStepAddressComplete = await foClassicCheckoutPage.goToDeliveryStep(page);
       expect(isStepAddressComplete).toEqual(true);
     });
 
     test('should go to payment step', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'goToPaymentStep', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToPaymentStep', baseContext);
 
       const isStepDeliveryComplete = await foClassicCheckoutPage.goToPaymentStep(page);
       expect(isStepDeliveryComplete, 'Step Address is not complete').toEqual(true);
     });
 
     test('should choose payment method and confirm the order', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'confirmOrder', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'confirmOrder', baseContext);
 
       // Payment step - Choose payment step
       await foClassicCheckoutPage.choosePaymentAndOrder(page, dataPaymentMethods.cashOnDelivery.moduleName);
@@ -121,7 +120,7 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
 
   test.describe('BO - Check the last order', async () => {
     test('should login in BO', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'loginBO', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'loginBO', baseContext);
   
       await boLoginPage.goTo(page, global.BO.URL);
       await boLoginPage.successLogin(page, global.BO.EMAIL, global.BO.PASSWD);
@@ -131,7 +130,7 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should go to \'Orders > Orders\' page', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'goToOrdersPage', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'goToOrdersPage', baseContext);
 
       await boDashboardPage.goToSubMenu(
         page,
@@ -144,14 +143,14 @@ test.describe('Cash on delivery (COD) module - Place an order with it', async ()
     });
 
     test('should reset all filters and get number of orders', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'resetFiltersFirst', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'resetFiltersFirst', baseContext);
 
       const numberOfOrders = await boOrdersPage.resetAndGetNumberOfLines(page);
       expect(numberOfOrders).toBeGreaterThan(0);
     });
 
     test('should check the last order', async () => {
-      await testContext.addContextItem(test.info(), 'testIdentifier', 'checkLastOrder', baseContext);
+      await utilsTest.addContextItem(test.info(), 'testIdentifier', 'checkLastOrder', baseContext);
 
       const rowOrderReference = await boOrdersPage.getTextColumn(page, 'reference', 1);
       expect(rowOrderReference).toEqual(orderReference);
