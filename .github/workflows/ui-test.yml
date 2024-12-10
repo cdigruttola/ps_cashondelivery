@@ -28,6 +28,7 @@ jobs:
           - '8.0.5' 
           - '8.1.6'
           - '8.2.0'
+          - '9.0.x'
           - 'nightly'
     env:
       PS_VERSION: ${{ matrix.PS_VERSION }}
@@ -37,6 +38,7 @@ jobs:
 
       - name: Start containers
         working-directory: tests/UI/
+        timeout-minutes: 15
         run: |
           docker compose -f "docker-compose.yml" up -d --build
           bash -c 'while [[ "$(curl -L -s -o /dev/null -w %{http_code} http://localhost/en/)" != "200" ]]; do sleep 5; done'
@@ -85,6 +87,7 @@ jobs:
           - '8.0.5' 
           - '8.1.6'
           - '8.2.0'
+          - '9.0.x'
           - 'nightly'
     permissions:
       contents: 'read'
