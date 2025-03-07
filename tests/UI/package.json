@@ -8,9 +8,9 @@
   "license": "MIT",
   "devDependencies": {
     "@prestashop-core/ui-testing": "https://github.com/PrestaShop/ui-testing-library#main",
-    "@types/node": "^20.11.5",
+    "@types/node": "^22.13.8",
     "@types/semver": "^7.5.8",
-    "dotenv": "^16.3.1",
-    "typescript": "^5.3.3"
+    "dotenv": "^16.4.7",
+    "typescript": "^5.8.2"
   }
 }
